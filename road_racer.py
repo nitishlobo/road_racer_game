@@ -1,3 +1,4 @@
+import time
 import pygame
 import colours
 
@@ -7,11 +8,26 @@ def update_car_position(x, y):
     Keyword arguments:
     x -- x co-ordinate from left of the window.
     y -- y co-ordinate from top of the window'''
-    gameDisplay.blit(carImg, (x, y))
+    game_display.blit(carImg, (x, y))
 
 def text_objects(text, font):
-    textSurface = font.render(text, True, black)
-    return textSurface, textSurface.get_rect()
+    text_surface = font.render(text, True, colours.BLACK)
+    return text_surface, text_surface.get_rect()
+
+def display_message(text):
+    #Font type and size of message.
+    large_font = pygame.font.Font('freesansbold.ttf', 115)
+    text_surf, text_rect = text_objects(text, large_font)
+    text_rect.center = ((display_width/2), (display_height/2))
+    #Update game window and display new text.
+    game_display.blit(text_surf, text_rect)
+    pygame.display.update()
+    #Delay before restarting the game
+    time.sleep(2)
+    game_loop()
+
+def crash():
+    display_message('You crashed!')
 
 def game_loop():
     #Start position of the car.
@@ -19,12 +35,13 @@ def game_loop():
     y = (display_height * 0.8)
     x_change = 0
 
-    gameExit = False
-    while not gameExit:
+    game_exit = False
+    while not game_exit:
         for event in pygame.event.get():
             #Exit main while loop.
             if event.type == pygame.QUIT:
-                gameExit = True
+                pygame.quit()
+                quit()
 
             #Keyboard control of main image.
             if event.type == pygame.KEYDOWN:
@@ -38,15 +55,15 @@ def game_loop():
         #Update x-co-ordinate of the car
         x += x_change
         #Display white background on game window.
-        gameDisplay.fill(colours.WHITE)
+        game_display.fill(colours.WHITE)
         update_car_position(x, y)
 
         #Exit game when car hits edges of the game window.
         if x > display_width - car_width or x <0:
-            gameExit = True
+            crash()
 
         pygame.display.update()
-        clock.tick(60)
+        clock.tick(120)
 
 pygame.init()
 #Set clock rate.
@@ -57,7 +74,7 @@ carImg = pygame.image.load('car_64_pixels.png')
 #Set game window size & title.
 display_width = 800
 display_height = 600
-gameDisplay = pygame.display.set_mode((display_width, display_height))
+game_display = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption('Road Racer')
 #Begin game
 game_loop()
